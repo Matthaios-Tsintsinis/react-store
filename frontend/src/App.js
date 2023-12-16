@@ -4,6 +4,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import Loading from "./components/Loading.js";
 import HomePage from "./pages/HomePage.js";
+import ProductPage from "./pages/ProductPage.js";
 import Shop from "./pages/Shop.js";
 
 function App() {
@@ -11,7 +12,7 @@ function App() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    async function fetchMovies() {
+    async function fetchProducts() {
       try {
         setLoading(true);
         const response = await axios.get("https://fakestoreapi.com/products"); //get all the products
@@ -25,7 +26,7 @@ function App() {
       }
     }
 
-    fetchMovies();
+    fetchProducts();
   }, []);
 
   return loading ? (
@@ -36,6 +37,7 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage items={items} />} />
           <Route path="/explore" element={<Shop />} />
+          <Route path="/product/:id" element={<ProductPage />} />
 
           <Route path="*" element={<h1>Path doesn't exist :(</h1>} />
         </Routes>

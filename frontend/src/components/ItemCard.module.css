@@ -1,0 +1,31 @@
+.container {
+  display: inline-block;
+}
+
+.image {
+  height: 200px;
+  object-fit: contain;
+}
+
+.showMoreSpan {
+  cursor: pointer;
+  color: black;
+}
+
+.priceParagraph {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.description {
+  color: rgb(123, 138, 139);
+}
+
+:global(.card) {
+  width: 400px;
+  padding: 1rem 0 0 0;
+}
+
+:global(.card-body) {
+  display: inline-block;
+}

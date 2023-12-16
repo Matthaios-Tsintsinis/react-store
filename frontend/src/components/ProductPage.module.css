@@ -1,0 +1,50 @@
+:global(body) {
+  color: rgb(123, 138, 139);
+}
+
+.container {
+  margin: 2rem 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4rem;
+  width: 100%;
+}
+
+.productImage {
+  width: 10%;
+  height: 10%;
+  float: left;
+}
+
+.info {
+  width: 30%;
+}
+
+.price {
+  color: black;
+}
+
+.buyCard {
+  width: 15rem;
+  padding: 1rem;
+  border-radius: 13px;
+  border: 2px solid gray;
+}
+
+.buyCardRow p {
+  display: inline-block;
+  width: 50%;
+}
+
+.available {
+  color: green;
+}
+
+.soldout {
+  color: red;
+}
+
+.productTitle {
+  color: black;
+}

@@ -1,6 +1,28 @@
 .carouselContainer {
   background-color: white !important;
-  padding: 1rem 0;
+  padding: 1rem 0 0 0;
+}
+
+.priceContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.itemPrice {
+  color: black;
+  width: 50%;
+  height: 10%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin-top: 1rem;
+  font-size: 17px;
+  font-weight: 600;
+  border-radius: 15px 15px 0 0;
+  padding: 1rem 1rem 0 1rem;
+  margin: 1.5rem 0 0 0;
 }
 
 :global(.carousel-control-prev-icon) {
