@@ -1,0 +1,8 @@
+.categoriesContainer {
+  display: flex;
+  padding: 2rem;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  gap: 1rem;
+}

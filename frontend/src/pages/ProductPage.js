@@ -3,7 +3,8 @@ import { useParams } from "react-router-dom";
 
 import Loading from "../components/Loading.js";
 import PageNav from "../components/PageNav.js";
-import RatingStars from "../components/RatingStars.js";
+import Reviews from "../components/Reviews.js";
+// import RatingStars from "../components/RatingStars.js";
 
 import axios from "axios";
 
@@ -19,7 +20,7 @@ function ProductPage() {
       try {
         setLoading(true);
         const response = await axios.get(
-          "https://fakestoreapi.com/products/" + id
+          "http://localhost:3000/api/products/" + id
         ); //get the product
         const result = await response.data;
 
@@ -46,12 +47,9 @@ function ProductPage() {
         <div className={styles.info}>
           <h4 className={styles.productTitle}>{item.title}</h4>
           <hr></hr>
-          <div>
-            <RatingStars
-              size={24}
-              messages={["Really Bad", "Bad", "Average", "Good", "Excellent"]}
-              onSetRating={() => console.log("nice")}
-            />
+          <div className={styles.ratingContainer}>
+            <span>⭐️ {item.rating?.rate}</span>
+            <p>{item.rating?.count} Ratings</p>
           </div>
           <hr></hr>
           <h5 className={styles.price}>{item.price}$</h5>
@@ -66,13 +64,21 @@ function ProductPage() {
           <hr />
           <div className={styles.buyCardRow}>
             <p>Status:</p>
-            <p className={styles.soldout}>Sold Out</p>
+            <p
+              className={
+                item.available === 0 ? styles.soldout : styles.available
+              }
+            >
+              {item.available === 0
+                ? "Sold Out"
+                : `${item.available} Available `}
+            </p>
           </div>
           <hr />
           <select name="quantity" id="quantity">
-            {Array.from({ length: 30 }, (cur, index) => (
+            {Array.from({ length: item.available }, (cur, index) => (
               <option value={index} key={index}>
-                Qty: {index}
+                Qty: {index + 1}
               </option>
             ))}
           </select>
@@ -80,6 +86,8 @@ function ProductPage() {
           <button>Add To Cart</button>
         </div>
       </div>
+
+      <Reviews />
     </div>
   );
 }

@@ -1,7 +1,30 @@
+import axios from "axios";
+import { useEffect, useState } from "react";
 import NavItem from "./NavItem";
 import styles from "./PageNav.module.css";
 
+axios.defaults.withCredentials = true;
+
 function PageNav() {
+  const [authenticated, setAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:3000/api/check-auth",
+          { withCredentials: true }
+        );
+        console.log(response.data);
+        setAuthenticated(response.data.authenticated);
+      } catch (error) {
+        console.error("Error checking authentication status:", error);
+      }
+    };
+
+    checkAuth();
+  }, []);
+
   return (
     // <nav>
     //   <ul className={styles.navUl}>
@@ -47,6 +70,10 @@ function PageNav() {
               alt="shopping cart"
               className={styles.shoppingCart}
             />
+          </NavItem>
+
+          <NavItem to="?" type="">
+            {authenticated ? "Authenticated" : "Not Authenticated"}
           </NavItem>
         </ul>
         {/* <form className="form-inline my-2 my-md-0">

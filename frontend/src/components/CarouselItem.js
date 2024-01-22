@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import styles from "./ItemCarousel.module.css";
 
 function CarouselItem({
@@ -11,17 +12,18 @@ function CarouselItem({
   characters,
 }) {
   return (
-    <div
+    <Link
+      to={`/product/${itemId}`}
       className={`carousel-item ${active ? "active" : ""} `}
       data-bs-interval={screenTime}
     >
-      <a href={`/product/${itemId}`}>
+      <div>
         <img
           src={src}
           className={`d-block ${styles.carouselImage}`}
           alt={alt}
-        />{" "}
-      </a>
+        />
+      </div>
 
       <div className={styles.priceContainer}>
         <div className={styles.itemPrice}>
@@ -33,7 +35,7 @@ function CarouselItem({
           <p>Price: {itemPrice}$</p>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
 

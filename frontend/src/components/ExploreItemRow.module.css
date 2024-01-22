@@ -1,0 +1,43 @@
+.container {
+  display: flex;
+  width: 90%;
+  min-height: 200px;
+  max-height: auto;
+  margin: 2rem;
+  gap: 2rem;
+  border: 1px solid grey;
+  border-radius: 13px;
+  padding: 1rem;
+  text-decoration: none;
+  color: black;
+}
+
+.imageContainer {
+  background-color: white;
+}
+
+.itemImage {
+  object-fit: contain;
+  width: 230px;
+  height: 200px;
+  padding: 0.5rem;
+  background-color: white;
+}
+
+.info {
+  height: 100%;
+}
+
+.description {
+  color: rgb(123, 138, 139);
+}
+
+.ratingsSpan {
+  margin-left: 0.5rem;
+  color: rgb(0, 113, 133);
+}
+
+.itemPrice {
+  position: absolute;
+  bottom: 0;
+}

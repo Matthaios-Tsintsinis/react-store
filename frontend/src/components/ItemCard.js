@@ -1,42 +1,43 @@
-import { useState } from "react";
+import { Link } from "react-router-dom";
 import styles from "./ItemCard.module.css";
 
+import ShowMore from "./ShwMore.js";
+
 function ItemCard({ item }) {
-  const [showMore, setShowMore] = useState(false);
+  const wordLimit = 50;
 
   return (
     <div className={styles.container}>
       <div className="card">
-        <img
-          className={`card-img-top ${styles.image}`}
-          src={item.image}
-          alt="Card cap"
-        />
+        <Link to={`/product/${item.id}`}>
+          <img
+            className={`card-img-top ${styles.image}`}
+            src={item.image}
+            alt="Card cap"
+          />
+        </Link>
         <div className="card-body">
-          <h5 className="card-title">{item.title}</h5>
+          <Link to={`/product/${item.id}`} className="card-title">
+            <h5>{item.title}</h5>
+          </Link>
           <div className="card-text">
-            <p className={styles.description}>
-              {showMore
-                ? item.description
-                : item.description.slice(0, 50) + "..."}
-              <span
-                className={styles.showMoreSpan}
-                onClick={() => setShowMore(!showMore)}
-              >
-                {showMore ? " Show less" : "Show more"}
-              </span>
-            </p>
+            <ShowMore
+              wordLimit={wordLimit}
+              text={item.description}
+              className={styles.description}
+            />
+
             {/* 
           <a href="#" onClick={() => setShowMore(!showMore)}>
           {showMore ? " Show less" : "...Show more"}
         </a> */}
           </div>
           <p>
-            <span className={styles.priceParagraph}>Price:</span> {item.price}$
+            <span className={styles.priceParagraph}>{item.price}$ </span>
           </p>
-          <a href={`/product/${item.id}`} className="btn btn-primary">
+          {/* <Link to={`/product/${item.id}`} className="btn btn-primary">
             Buy
-          </a>
+          </Link> */}
         </div>
       </div>
     </div>

@@ -7,11 +7,6 @@
   object-fit: contain;
 }
 
-.showMoreSpan {
-  cursor: pointer;
-  color: black;
-}
-
 .priceParagraph {
   font-size: 17px;
   font-weight: 600;
@@ -24,8 +19,17 @@
 :global(.card) {
   width: 400px;
   padding: 1rem 0 0 0;
+  min-height: 450px;
+  max-height: auto;
 }
 
 :global(.card-body) {
   display: inline-block;
+  min-height: 230px;
+  max-height: auto;
+}
+
+:global(.card-title) {
+  text-decoration: none;
+  color: black;
 }

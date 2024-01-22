@@ -1,0 +1,12 @@
+.user {
+  display: flex;
+  align-items: center;
+}
+
+.avatar {
+  border-radius: 50%;
+  width: 25px;
+}
+
+.username {
+}

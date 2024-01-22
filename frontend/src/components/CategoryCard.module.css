@@ -1,0 +1,28 @@
+.categoryCard {
+  border: 3px solid black;
+  width: 20rem;
+  height: 400px !important;
+}
+
+.imgContainer {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 1rem;
+  height: 80%;
+  width: 100%;
+  background-color: white;
+}
+
+.imgContainer img {
+  width: 50%;
+  height: 50%;
+}
+
+.categoryTitle {
+  text-align: center;
+  font-weight: 600;
+}
+
+:global(.card-body) {
+  min-height: 100px;
+}
