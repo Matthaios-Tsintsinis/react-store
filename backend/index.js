@@ -1,8 +1,12 @@
-// import bcrypt, { hash } from "bcrypt";
+import bcrypt, { hash } from "bcrypt";
 import bodyParser from "body-parser";
+import MongoStore from "connect-mongo";
+import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
 import session from "express-session";
+import fs from "fs";
+import https from "https";
 import mongoose from "mongoose";
 import passport from "passport";
 import passportLocalMongoose from "passport-local-mongoose";
@@ -13,17 +17,52 @@ const port = 3000;
 // const saltRounds = 10;
 
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cors({ origin: "http://www.localhost:3001", credentials: true }));
+app.use(bodyParser.json());
+
+app.use(
+  cors({
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    origin: "http://localhost:3001",
+    credentials: true,
+  })
+);
+
+// app.use(
+//   session({
+//     secret: "This is a secret key.",
+//     resave: false,
+//     saveUninitialized: false,
+//     store: MongoStore.create({
+//       mongoUrl:
+//         "mongodb+srv://admin-manthos:Ym3023mzWlBDK1ly@cluster0.yguea7t.mongodb.net/reactStore?retryWrites=true&w=majority&appName=AtlasApp", // replace with your MongoDB connection string
+//       collection: "sessions",
+//       // ttl: 24 * 60 * 60,
+//     }),
+//     cookie: {
+//       httpOnly: true,
+//       secure: true,
+//       sameSite: "None",
+//       domain: "localhost:3001",
+//       // maxAge: 8 * 60 * 60 * 1000,
+//     },
+//   })
+// );
 
 app.use(
   session({
     secret: "This is a secret key.",
     resave: false,
     saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl:
+        "mongodb+srv://admin-manthos:Ym3023mzWlBDK1ly@cluster0.yguea7t.mongodb.net/reactStore?retryWrites=true&w=majority&appName=AtlasApp",
+    }),
     cookie: {
       httpOnly: true,
-      secure: false,
+      secure: true, //when false throws error "needs to be secure in order to be "none" samesite"
       sameSite: "None",
+      domain: "localhost",
     },
   })
 );
@@ -32,7 +71,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 mongoose.connect(
-  "mongodb+srv://admin-manthos:UbtCZgWc0uT1apfz@cluster0.yguea7t.mongodb.net/reactStore?retryWrites=true&w=majority&appName=AtlasApp"
+  "mongodb+srv://admin-manthos:Ym3023mzWlBDK1ly@cluster0.yguea7t.mongodb.net/reactStore?retryWrites=true&w=majority&appName=AtlasApp"
 );
 
 const productSchema = new mongoose.Schema({
@@ -61,6 +100,10 @@ passport.use(User.createStrategy());
 
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
+
+app.get("/", (req, res) => {
+  res.send("UP AND RUNNING!");
+});
 
 app.get("/api/products", async function (req, res) {
   let productsFromDB = await Product.find({});
@@ -140,32 +183,30 @@ app.post("/api/register", async function (req, res) {
   });
 });
 
+// await User.findOne({ email: email }).then((foundUser) => {
+//   if (foundUser) {
+//     bcrypt.compare(password, foundUser.password, function (err, result) {
+//       // result == true
+//       if (result === true) {
+//         res.redirect("http://localhost:3001");
+//       } else {
+//         res.redirect("http://localhost:3001/signIn");
+//       }
+//     });
+//   }
+// });
 app.post("/api/signIn", async function (req, res) {
   const username = req.body.username;
   const password = req.body.password;
 
-  // await User.findOne({ email: email }).then((foundUser) => {
-  //   if (foundUser) {
-  //     bcrypt.compare(password, foundUser.password, function (err, result) {
-  //       // result == true
-  //       if (result === true) {
-  //         res.redirect("http://localhost:3001");
-  //       } else {
-  //         res.redirect("http://localhost:3001/signIn");
-  //       }
-  //     });
-  //   }
-  // });
+  console.log(username);
+  console.log(password);
 
-  const userInDB = await User.findOne({ username: username });
+  if (username === undefined || password === undefined) {
+    return;
+  }
 
-  const user = new User({
-    email: userInDB.email,
-    password: password,
-    username: username,
-    cart: userInDB.cart,
-    reviews: userInDB.reviews,
-  });
+  const user = await User.findOne({ username: username });
 
   req.login(user, (err) => {
     if (err) {
@@ -173,11 +214,12 @@ app.post("/api/signIn", async function (req, res) {
       res.redirect("http://localhost:3001/signin");
     } else {
       passport.authenticate("local")(req, res, function () {
-        req.session.save((er) => {
+        req.session.save((err) => {
           if (err) {
             console.log(err);
           } else {
-            res.redirect("http://www.localhost:3001/");
+            console.log(req.user);
+            res.redirect("http://localhost:3001/");
           }
         });
       });
@@ -195,6 +237,9 @@ app.post("/api/signOut", function (req, res, next) {
 });
 
 app.get("/api/check-auth", (req, res) => {
+  console.log("Session:", req.session);
+  console.log("User:", req.user);
+
   if (req.isAuthenticated()) {
     // User is authenticated
     console.log("true");
@@ -206,8 +251,13 @@ app.get("/api/check-auth", (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log("Listening on port " + port);
+const options = {
+  key: fs.readFileSync("C:/Users/PC/private.key"),
+  cert: fs.readFileSync("C:/Users/PC/public.crt"),
+};
+
+https.createServer(options, app).listen(port, () => {
+  console.log("Server listening on port " + port);
 });
 
 const product20 = new Product({

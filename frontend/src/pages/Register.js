@@ -1,12 +1,17 @@
 import { Link } from "react-router-dom";
 
+import { useEffect } from "react";
 import styles from "../components/Register.module.css";
 
 function Register() {
+  useEffect(() => {
+    console.log("register");
+  }, []);
+
   return (
     <div className={styles.container}>
       <form
-        action="http://localhost:3000/api/register"
+        action="https://localhost:3000/api/register"
         method="POST"
         className={styles.form}
       >

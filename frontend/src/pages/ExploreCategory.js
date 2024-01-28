@@ -42,7 +42,7 @@ function ExploreCategory() {
       try {
         setLoading(true);
         const response = await axios.get(
-          `http://localhost:3000/api/category/${category}`
+          `https://localhost:3000/api/category/${category}`
         ); //get all the products
         const result = await response.data;
 

@@ -4,6 +4,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import ItemsList from "./components/ItemsList.js";
 import Loading from "./components/Loading.js";
+import PageNav from "./components/PageNav.js";
 import ExploreCategory from "./pages/ExploreCategory.js";
 import HomePage from "./pages/HomePage.js";
 import ProductPage from "./pages/ProductPage.js";
@@ -20,7 +21,7 @@ function App() {
     async function fetchProducts() {
       try {
         setLoading(true);
-        const response = await axios.get("http://localhost:3000/api/products"); //get all the products
+        const response = await axios.get("https://localhost:3000/api/products"); //get all the products
         const result = await response.data;
 
         setItems(result);
@@ -65,6 +66,8 @@ function App() {
           <Route path="register" element={<Register />} />
 
           <Route path="signin" element={<SignIn />} />
+
+          <Route path="cart" element={<PageNav />} />
 
           <Route path="*" element={<h1>Path doesn't exist :(</h1>} />
         </Routes>

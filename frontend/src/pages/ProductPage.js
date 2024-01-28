@@ -20,7 +20,7 @@ function ProductPage() {
       try {
         setLoading(true);
         const response = await axios.get(
-          "http://localhost:3000/api/products/" + id
+          "https://localhost:3000/api/products/" + id
         ); //get the product
         const result = await response.data;
 

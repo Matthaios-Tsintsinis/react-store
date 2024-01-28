@@ -11,11 +11,10 @@ function PageNav() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:3000/api/check-auth",
-          { withCredentials: true }
-        );
-        console.log(response.data);
+        const response = await axios.get("/api/check-auth", {
+          withCredentials: true,
+        });
+        console.log(response.data); //always prints "authenticated: false"
         setAuthenticated(response.data.authenticated);
       } catch (error) {
         console.error("Error checking authentication status:", error);
