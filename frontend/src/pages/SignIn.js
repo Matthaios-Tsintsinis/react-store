@@ -1,12 +1,27 @@
 // import { useEffect } from "react";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import Loading from "../components/Loading";
 import styles from "./SignIn.module.css";
 
-function SignIn() {
+function SignIn({ authentication, onRefresh }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    try {
+      setLoading(true);
+      if (authentication.authenticated) {
+        window.history.back();
+      }
+    } catch (e) {
+      console.log(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [authentication.authenticated]);
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -15,11 +30,11 @@ function SignIn() {
       withCredentials: true,
     };
 
-    console.log(username, password);
     axios
       .post("api/signIn", { username: username, password: password }, config)
       .then((response) => {
-        window.location.href = "http://localhost:3001/";
+        onRefresh();
+        window.history.back();
       })
       .catch((error) => {
         console.log("Error:", error.message);
@@ -27,7 +42,9 @@ function SignIn() {
       });
   }
 
-  return (
+  return loading ? (
+    <Loading />
+  ) : (
     <div className={styles.container}>
       <form onSubmit={handleSubmit} className={styles.form}>
         <h2>Sign In</h2>

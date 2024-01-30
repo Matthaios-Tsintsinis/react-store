@@ -1,12 +1,45 @@
-.user {
+.container {
+  padding: 0.5rem;
+  border: 1px solid rgb(59, 70, 70);
+  border-radius: 13px;
+  overflow: break-word;
+  margin-bottom: 1rem;
+}
+
+.ratingHeaderContainer {
   display: flex;
   align-items: center;
 }
 
-.avatar {
-  border-radius: 50%;
-  width: 25px;
+.username {
+  font-size: 100;
+  font-weight: 600;
+  color: #363636;
 }
 
-.username {
+.ratingDate {
+  font-weight: 300;
+  font-size: smaller;
+  margin-left: 0.5rem;
+  color: gray;
+}
+
+.ratingStarsContainer {
+  display: flex;
+}
+
+.ratingStar {
+  width: 20px;
+}
+
+.authorOptions {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0 1rem 0 auto;
+}
+
+.message {
+  color: rgb(59, 70, 70);
+  position: relative;
+  bottom: 0.5rem;
 }

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
+import AddRating from "../components/AddRating.js";
 import Loading from "../components/Loading.js";
 import PageNav from "../components/PageNav.js";
 import Reviews from "../components/Reviews.js";
@@ -10,10 +11,15 @@ import axios from "axios";
 
 import styles from "../components/ProductPage.module.css";
 
-function ProductPage() {
+function ProductPage({ authentication }) {
   const { id } = useParams();
   const [item, setItem] = useState({});
   const [loading, setLoading] = useState(false);
+  const [refresh, setRefresh] = useState(false);
+
+  function onRefresh() {
+    setRefresh((refresh) => !refresh);
+  }
 
   useEffect(() => {
     async function fetchProduct() {
@@ -33,13 +39,13 @@ function ProductPage() {
     }
 
     fetchProduct();
-  }, [id]);
+  }, [id, refresh]);
 
   return loading ? (
     <Loading />
   ) : (
     <div>
-      <PageNav />
+      <PageNav authentication={authentication} key="ProductPagePageNav" />
 
       <div className={styles.container}>
         <img src={item.image} className={styles.productImage} alt={item.name} />
@@ -74,20 +80,35 @@ function ProductPage() {
                 : `${item.available} Available `}
             </p>
           </div>
-          <hr />
-          <select name="quantity" id="quantity">
-            {Array.from({ length: item.available }, (cur, index) => (
-              <option value={index} key={index}>
-                Qty: {index + 1}
-              </option>
-            ))}
-          </select>
-          <hr />
-          <button>Add To Cart</button>
+          {item.available > 0 && (
+            <div>
+              <hr />
+              <select name="quantity" id="quantity">
+                {Array.from({ length: item.available }, (cur, index) => (
+                  <option value={index} key={index}>
+                    Qty: {index + 1}
+                  </option>
+                ))}
+              </select>
+              <hr />
+              <button>Add To Cart</button>
+            </div>
+          )}
         </div>
       </div>
 
-      <Reviews />
+      <div className={styles.outterReviewsContainer}>
+        <div className={styles.reviewsContainer}>
+          <h4>Reviews</h4>
+          <hr />
+        </div>
+      </div>
+      <AddRating
+        item={item}
+        authentication={authentication}
+        triggerRefresh={onRefresh}
+      />
+      <Reviews item={item} authentication={authentication} />
     </div>
   );
 }

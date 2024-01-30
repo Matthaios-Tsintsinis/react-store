@@ -5,25 +5,7 @@ import styles from "./PageNav.module.css";
 
 axios.defaults.withCredentials = true;
 
-function PageNav() {
-  const [authenticated, setAuthenticated] = useState(false);
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const response = await axios.get("/api/check-auth", {
-          withCredentials: true,
-        });
-        console.log(response.data); //always prints "authenticated: false"
-        setAuthenticated(response.data.authenticated);
-      } catch (error) {
-        console.error("Error checking authentication status:", error);
-      }
-    };
-
-    checkAuth();
-  }, []);
-
+function PageNav({ authentication }) {
   return (
     // <nav>
     //   <ul className={styles.navUl}>
@@ -71,9 +53,11 @@ function PageNav() {
             />
           </NavItem>
 
-          <NavItem to="?" type="">
-            {authenticated ? "Authenticated" : "Not Authenticated"}
-          </NavItem>
+          {authentication.authenticated ? (
+            <NavItem to="/profile">{authentication.user.username}</NavItem>
+          ) : (
+            <NavItem to="/signIn">Sign In</NavItem>
+          )}
         </ul>
         {/* <form className="form-inline my-2 my-md-0">
           <input className="form-control" type="text" placeholder="Search" />

@@ -60,7 +60,7 @@ app.use(
     }),
     cookie: {
       httpOnly: true,
-      secure: true, //when false throws error "needs to be secure in order to be "none" samesite"
+      secure: true,
       sameSite: "None",
       domain: "localhost",
     },
@@ -81,7 +81,13 @@ const productSchema = new mongoose.Schema({
   description: String,
   category: String,
   image: String,
-  rating: { rate: Number, count: Number, ratings: Array },
+  rating: {
+    rate: Number,
+    count: Number,
+    ratings: [
+      { author: Object, rating: Number, message: String, date: String },
+    ],
+  },
   available: Number,
 });
 const Product = mongoose.model("Product", productSchema);
@@ -91,7 +97,7 @@ const userSchema = new mongoose.Schema({
   password: String,
   email: String,
   cart: [productSchema],
-  reviews: Array,
+  reviews: [{ rating: Number, message: String, date: String }],
 });
 userSchema.plugin(passportLocalMongoose);
 const User = mongoose.model("User", userSchema);
@@ -100,165 +106,6 @@ passport.use(User.createStrategy());
 
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
-
-app.get("/", (req, res) => {
-  res.send("UP AND RUNNING!");
-});
-
-app.get("/api/products", async function (req, res) {
-  let productsFromDB = await Product.find({});
-
-  if (productsFromDB.length === 0) {
-    await Product.insertMany(initialProducts);
-
-    productsFromDB = await Product.find({});
-  }
-
-  res.send(productsFromDB);
-});
-
-app.get("/api/products/:id", async function (req, res) {
-  const id = parseInt(req.params.id);
-
-  const result = await Product.findOne({ id: id });
-
-  res.send(result);
-});
-
-app.get("/api/category/:category", async function (req, res) {
-  const category = req.params.category;
-
-  const items = await Product.find({ category: category });
-
-  res.send(items);
-});
-
-app.post("/api/register", async function (req, res) {
-  const username = req.body.username;
-  const email = req.body.email;
-  const password = req.body.password;
-  const passwordValidation = req.body.passwordValidation;
-
-  // console.log(name, email, password, passwordValidation);
-
-  // if (
-  //   name !== null &&
-  //   email !== null &&
-  //   password !== null &&
-  //   password.length > 6 &&
-  //   passwordValidation === password
-  // ) {
-  //   bcrypt.hash(password, saltRounds, function (err, hash) {
-  //     const user = new User({
-  //       username: name,
-  //       password: hash,
-  //       email: email,
-  //       cart: [],
-  //       reviews: [],
-  //     });
-  //     user.save();
-  //   });
-
-  //   res.redirect("http://localhost:3001");
-  // } else {
-  //   console.log("Error");
-  // }
-
-  const newUser = new User({
-    username: username,
-    email: email,
-    cart: [],
-    reviews: [],
-  });
-
-  User.register(newUser, password, function (err, user) {
-    if (err) {
-      console.log(err);
-      res.redirect("localhost:3001/register");
-    } else {
-      passport.authenticate("local")(req, res, function () {
-        res.redirect("http://www.localhost:3001/");
-      });
-    }
-  });
-});
-
-// await User.findOne({ email: email }).then((foundUser) => {
-//   if (foundUser) {
-//     bcrypt.compare(password, foundUser.password, function (err, result) {
-//       // result == true
-//       if (result === true) {
-//         res.redirect("http://localhost:3001");
-//       } else {
-//         res.redirect("http://localhost:3001/signIn");
-//       }
-//     });
-//   }
-// });
-app.post("/api/signIn", async function (req, res) {
-  const username = req.body.username;
-  const password = req.body.password;
-
-  console.log(username);
-  console.log(password);
-
-  if (username === undefined || password === undefined) {
-    return;
-  }
-
-  const user = await User.findOne({ username: username });
-
-  req.login(user, (err) => {
-    if (err) {
-      console.log(err);
-      res.redirect("http://localhost:3001/signin");
-    } else {
-      passport.authenticate("local")(req, res, function () {
-        req.session.save((err) => {
-          if (err) {
-            console.log(err);
-          } else {
-            console.log(req.user);
-            res.redirect("http://localhost:3001/");
-          }
-        });
-      });
-    }
-  });
-});
-
-app.post("/api/signOut", function (req, res, next) {
-  req.logout(function (err) {
-    if (err) {
-      return next(err);
-    }
-    res.redirect("http://localhost:3001/");
-  });
-});
-
-app.get("/api/check-auth", (req, res) => {
-  console.log("Session:", req.session);
-  console.log("User:", req.user);
-
-  if (req.isAuthenticated()) {
-    // User is authenticated
-    console.log("true");
-    res.json({ authenticated: true, user: req.user });
-  } else {
-    console.log("false");
-    // User is not authenticated
-    res.json({ authenticated: false });
-  }
-});
-
-const options = {
-  key: fs.readFileSync("C:/Users/PC/private.key"),
-  cert: fs.readFileSync("C:/Users/PC/public.crt"),
-};
-
-https.createServer(options, app).listen(port, () => {
-  console.log("Server listening on port " + port);
-});
 
 const product20 = new Product({
   id: 20,
@@ -398,7 +245,7 @@ const product7 = new Product({
 });
 
 const product8 = new Product({
-  //       id: 8,
+  id: 8,
   title: "Pierced Owl Rose Gold Plated Stainless Steel Double",
   price: 10.99,
   description:
@@ -566,6 +413,24 @@ const product18 = new Product({
   available: Math.round(Math.random() * 100),
 });
 
+const product21 = new Product({
+  id: 21,
+  title: "Opna Women's Short Sleeve Moisture",
+  price: 7.95,
+  description:
+    "100% Polyester, Machine wash, 100% cationic polyester interlock, Machine Wash & Pre Shrunk for a Great Fit, Lightweight, roomy and highly breathable with moisture wicking fabric which helps to keep moisture away, Soft Lightweight Fabric with comfortable V-neck collar and a slimmer fit, delivers a sleek, more feminine silhouette and Added Comfort",
+  category: "women's clothing",
+  image: "https://fakestoreapi.com/img/51eg55uWmdL._AC_UX679_.jpg",
+  rating: {
+    rate: 4,
+    count: 1,
+    ratings: [
+      { author: "azukho", rating: 4, message: "really good", date: "2015-..." },
+    ],
+  },
+  available: Math.round(Math.random() * 100),
+});
+
 const initialProducts = [
   product1,
   product2,
@@ -587,4 +452,252 @@ const initialProducts = [
   product18,
   product19,
   product20,
+  product21,
 ];
+
+app.get("/", (req, res) => {
+  res.send("UP AND RUNNING!");
+});
+
+app.get("/api/products", async function (req, res) {
+  let productsFromDB = await Product.find({});
+
+  if (productsFromDB.length === 0) {
+    await Product.insertMany(initialProducts);
+
+    productsFromDB = await Product.find({});
+  }
+
+  res.send(productsFromDB);
+});
+
+app.get("/api/products/:id", async function (req, res) {
+  const id = parseInt(req.params.id);
+
+  const result = await Product.findOne({ id: id });
+
+  res.send(result);
+});
+
+app.get("/api/category/:category", async function (req, res) {
+  const category = req.params.category;
+
+  const items = await Product.find({ category: category });
+
+  res.send(items);
+});
+
+app.post("/api/register", async function (req, res) {
+  const username = req.body.username;
+  const email = req.body.email;
+  const password = req.body.password;
+  const passwordValidation = req.body.passwordValidation;
+
+  // console.log(name, email, password, passwordValidation);
+
+  // if (
+  //   name !== null &&
+  //   email !== null &&
+  //   password !== null &&
+  //   password.length > 6 &&
+  //   passwordValidation === password
+  // ) {
+  //   bcrypt.hash(password, saltRounds, function (err, hash) {
+  //     const user = new User({
+  //       username: name,
+  //       password: hash,
+  //       email: email,
+  //       cart: [],
+  //       reviews: [],
+  //     });
+  //     user.save();
+  //   });
+
+  //   res.redirect("http://localhost:3001");
+  // } else {
+  //   console.log("Error");
+  // }
+
+  const newUser = new User({
+    username: username,
+    email: email,
+    cart: [],
+    reviews: [],
+  });
+
+  User.register(newUser, password, function (err, user) {
+    if (err) {
+      console.log(err);
+      res.redirect("localhost:3001/register");
+    } else {
+      passport.authenticate("local")(req, res, function () {
+        res.redirect("http://www.localhost:3001/");
+      });
+    }
+  });
+});
+
+// await User.findOne({ email: email }).then((foundUser) => {
+//   if (foundUser) {
+//     bcrypt.compare(password, foundUser.password, function (err, result) {
+//       // result == true
+//       if (result === true) {
+//         res.redirect("http://localhost:3001");
+//       } else {
+//         res.redirect("http://localhost:3001/signIn");
+//       }
+//     });
+//   }
+// });
+app.post("/api/signIn", async function (req, res) {
+  const username = req.body.username;
+  const password = req.body.password;
+
+  console.log(username);
+  console.log(password);
+
+  if (username === undefined || password === undefined) {
+    return;
+  }
+
+  const user = await User.findOne({ username: username });
+
+  req.login(user, (err) => {
+    if (err) {
+      console.log(err);
+      res.redirect("http://localhost:3001/signin");
+    } else {
+      passport.authenticate("local")(req, res, function () {
+        req.session.save((err) => {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log(req.user);
+            res.redirect("http://localhost:3001/");
+          }
+        });
+      });
+    }
+  });
+});
+
+app.post("/api/signOut", function (req, res, next) {
+  req.logout(function (err) {
+    if (err) {
+      return next(err);
+    }
+    res.redirect("http://localhost:3001/");
+  });
+});
+
+app.get("/api/check-auth", (req, res) => {
+  // console.log("Session:", req.session);
+  // console.log("User:", req.user);
+
+  if (req.isAuthenticated()) {
+    // User is authenticated
+    res.json({ authenticated: true, user: req.user });
+  } else {
+    // User is not authenticated
+    res.json({ authenticated: false });
+  }
+});
+
+import { ObjectId } from "mongoose";
+
+app.post("/api/addRating", async (req, res) => {
+  const itemID = req.body.itemID;
+  const userID = req.body.userID;
+  const username = req.body.username;
+  const rating = req.body.rating;
+  const message = req.body.message;
+
+  console.log(itemID);
+  console.log(userID);
+  console.log(username);
+  console.log(rating);
+  console.log(message);
+
+  if (!itemID || !userID || !username || !rating || !message) {
+    console.log("Something missing");
+    res.sendStatus(200);
+  }
+
+  console.log("first");
+
+  await User.updateOne(
+    { _id: userID },
+    {
+      $push: {
+        reviews: {
+          rating: rating,
+          message: message,
+          date: new Date().toLocaleDateString("en-GB"),
+          productID: itemID,
+        },
+      },
+    }
+  );
+
+  console.log("here");
+
+  // Step 1: Push the new rating
+  await Product.updateOne(
+    { id: itemID },
+    {
+      $push: {
+        "rating.ratings": {
+          author: { username, userID },
+          rating: rating,
+          message: message,
+          date: new Date().toLocaleDateString("en-GB"),
+        },
+      },
+    }
+  );
+
+  // Step 2: Update the average rating and count
+  const updatedProduct = await Product.findOneAndUpdate(
+    { id: itemID },
+    [
+      {
+        $set: {
+          rating: {
+            $mergeObjects: [
+              "$rating",
+              {
+                rate: {
+                  $cond: {
+                    if: { $eq: [{ $size: "$rating.ratings" }, 0] },
+                    then: 0, // If size is 0, set rate to 0
+                    else: {
+                      $divide: [
+                        { $sum: "$rating.ratings.rating" },
+                        { $size: "$rating.ratings" },
+                      ],
+                    },
+                  },
+                },
+              },
+              { count: { $add: ["$rating.count", 1] } },
+            ],
+          },
+        },
+      },
+    ],
+    { new: true, runValidators: true }
+  );
+
+  console.log("done");
+
+  res.sendStatus(200);
+});
+
+const options = {
+  key: fs.readFileSync("C:/Users/mants/private.key"),
+  cert: fs.readFileSync("C:/Users/mants/public.crt"),
+};
+
+https.createServer(options, app).listen(port, () => {
+  console.log("Server listening on port " + port);
+});

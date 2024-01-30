@@ -1,13 +1,19 @@
 import Review from "../components/Review.js";
 import styles from "../components/Reviews.module.css";
 
-function Reviews() {
+function Reviews({ item, authentication }) {
   return (
     <div className={styles.outterContainer}>
       <div className={styles.container}>
-        <h4>Reviews</h4>
-        <hr />
-        <Review />
+        {item.rating?.ratings.map((userRating, i) => (
+          <Review
+            item={item}
+            rating={userRating}
+            index={i}
+            authentication={authentication}
+            key={i}
+          />
+        ))}
       </div>
     </div>
   );

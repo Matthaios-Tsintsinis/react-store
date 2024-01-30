@@ -1,14 +1,29 @@
 import { Link } from "react-router-dom";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import styles from "../components/Register.module.css";
 
-function Register() {
-  useEffect(() => {
-    console.log("register");
-  }, []);
+import Loading from "../components/Loading.js";
 
-  return (
+function Register({ authentication }) {
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    try {
+      setLoading(true);
+      if (authentication.authenticated) {
+        window.location.href = "http://localhost:3001/";
+      }
+    } catch (e) {
+      console.log(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [authentication.authenticated]);
+
+  return loading ? (
+    <Loading />
+  ) : (
     <div className={styles.container}>
       <form
         action="https://localhost:3000/api/register"
