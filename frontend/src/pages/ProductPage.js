@@ -54,7 +54,9 @@ function ProductPage({ authentication }) {
           <h4 className={styles.productTitle}>{item.title}</h4>
           <hr></hr>
           <div className={styles.ratingContainer}>
-            <span>⭐️ {item.rating?.rate}</span>
+            <span>
+              ⭐️ {(Math.round(item.rating?.rate * 100) / 100).toFixed(2)}
+            </span>
             <p>{item.rating?.count} Ratings</p>
           </div>
           <hr></hr>
@@ -108,7 +110,11 @@ function ProductPage({ authentication }) {
         authentication={authentication}
         triggerRefresh={onRefresh}
       />
-      <Reviews item={item} authentication={authentication} />
+      <Reviews
+        item={item}
+        authentication={authentication}
+        triggerRefresh={onRefresh}
+      />
     </div>
   );
 }

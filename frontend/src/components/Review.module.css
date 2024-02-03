@@ -43,3 +43,8 @@
   position: relative;
   bottom: 0.5rem;
 }
+
+.editedSpan {
+  font-size: 0.8rem;
+  color: #868484;
+}

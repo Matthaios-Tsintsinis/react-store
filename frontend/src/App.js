@@ -4,14 +4,12 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import ItemsList from "./components/ItemsList.js";
 import Loading from "./components/Loading.js";
-import PageNav from "./components/PageNav.js";
 import ExploreCategory from "./pages/ExploreCategory.js";
 import HomePage from "./pages/HomePage.js";
 import ProductPage from "./pages/ProductPage.js";
 import Register from "./pages/Register.js";
 import Shop from "./pages/Shop.js";
 import SignIn from "./pages/SignIn.js";
-
 function App() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);

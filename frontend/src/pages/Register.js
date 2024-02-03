@@ -12,7 +12,7 @@ function Register({ authentication }) {
     try {
       setLoading(true);
       if (authentication.authenticated) {
-        window.location.href = "http://localhost:3001/";
+        window.location.href = "http://localhost:3001";
       }
     } catch (e) {
       console.log(e.message);

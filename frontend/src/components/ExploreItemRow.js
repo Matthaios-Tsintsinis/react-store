@@ -21,9 +21,9 @@ function ExploreItemRow({ item }) {
         />
 
         <p>
-          ⭐️ {item.rating?.rate}{" "}
+          ⭐️ {(Math.round(item.rating?.rate * 100) / 100).toFixed(2)}{" "}
           <span className={styles.ratingsSpan}>
-            {item.rating?.count} Ratings
+            {item.rating?.count} Rating(s)
           </span>
         </p>
         <h3 style={{ position: "relative" }}>{item.price}$</h3>

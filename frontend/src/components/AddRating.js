@@ -37,11 +37,10 @@ function AddRating({ item, authentication, triggerRefresh }) {
   return authentication.authenticated ? (
     <div className={styles.outterContainer}>
       <div className={styles.container}>
+        <h6>Add a review</h6>
         <form className={styles.form}>
-          <h6>Add a review</h6>
-          <input
+          <textarea
             value={myReview}
-            type="text"
             placeholder="Your review here (optional)"
             className={styles.input}
             onChange={(e) => setMyReview(e.target.value)}

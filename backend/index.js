@@ -53,7 +53,7 @@ app.use(
   session({
     secret: "This is a secret key.",
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true,
     store: MongoStore.create({
       mongoUrl:
         "mongodb+srv://admin-manthos:Ym3023mzWlBDK1ly@cluster0.yguea7t.mongodb.net/reactStore?retryWrites=true&w=majority&appName=AtlasApp",
@@ -63,6 +63,7 @@ app.use(
       secure: true,
       sameSite: "None",
       domain: "localhost",
+      maxAge: 8 * 60 * 60 * 1000,
     },
   })
 );
@@ -85,7 +86,13 @@ const productSchema = new mongoose.Schema({
     rate: Number,
     count: Number,
     ratings: [
-      { author: Object, rating: Number, message: String, date: String },
+      {
+        author: Object,
+        rating: Number,
+        message: String,
+        date: String,
+        edit: { edited: Boolean, date: String },
+      },
     ],
   },
   available: Number,
@@ -97,7 +104,15 @@ const userSchema = new mongoose.Schema({
   password: String,
   email: String,
   cart: [productSchema],
-  reviews: [{ rating: Number, message: String, date: String }],
+  reviews: [
+    {
+      rating: Number,
+      message: String,
+      date: String,
+      productID: String,
+      edit: { edited: Boolean, date: String },
+    },
+  ],
 });
 userSchema.plugin(passportLocalMongoose);
 const User = mongoose.model("User", userSchema);
@@ -531,7 +546,7 @@ app.post("/api/register", async function (req, res) {
       res.redirect("localhost:3001/register");
     } else {
       passport.authenticate("local")(req, res, function () {
-        res.redirect("http://www.localhost:3001/");
+        res.redirect("http://localhost:3001/");
       });
     }
   });
@@ -603,8 +618,6 @@ app.get("/api/check-auth", (req, res) => {
   }
 });
 
-import { ObjectId } from "mongoose";
-
 app.post("/api/addRating", async (req, res) => {
   const itemID = req.body.itemID;
   const userID = req.body.userID;
@@ -612,18 +625,10 @@ app.post("/api/addRating", async (req, res) => {
   const rating = req.body.rating;
   const message = req.body.message;
 
-  console.log(itemID);
-  console.log(userID);
-  console.log(username);
-  console.log(rating);
-  console.log(message);
-
   if (!itemID || !userID || !username || !rating || !message) {
     console.log("Something missing");
     res.sendStatus(200);
   }
-
-  console.log("first");
 
   await User.updateOne(
     { _id: userID },
@@ -638,8 +643,6 @@ app.post("/api/addRating", async (req, res) => {
       },
     }
   );
-
-  console.log("here");
 
   // Step 1: Push the new rating
   await Product.updateOne(
@@ -688,14 +691,159 @@ app.post("/api/addRating", async (req, res) => {
     { new: true, runValidators: true }
   );
 
-  console.log("done");
+  res.sendStatus(200);
+});
+
+app.post("/api/deleteRating", async (req, res) => {
+  const productId = req.body.productId;
+  const ratingId = req.body.ratingId;
+  const rating = req.body.rating;
+  const message = req.body.message;
+  const date = req.body.date;
+  const userId = req.body.author;
+
+  await Product.updateOne(
+    { _id: productId, "rating.ratings._id": ratingId },
+    {
+      $pull: { "rating.ratings": { _id: ratingId } },
+      $inc: { "rating.count": -1 },
+    }
+  )
+    .exec()
+    .then(async (res) => {
+      console.log(res);
+
+      // Find the product again after the rating has been removed
+      const product = await Product.findOne({ _id: productId });
+
+      // Recalculate the average rating
+      let avgRating = 0;
+      if (product.rating.ratings.length > 0) {
+        avgRating =
+          product.rating.ratings.reduce((acc, curr) => acc + curr.rating, 0) /
+          product.rating.ratings.length;
+      }
+
+      // Update the average rating
+      await Product.updateOne({ _id: productId }, { "rating.rate": avgRating });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  // Assuming you have some criteria to identify the review
+  let criteria = { rating: rating, message: message, date: date };
+
+  await User.findOne({ _id: userId }) // replace someUsername with the actual username
+    .then((user) => {
+      let review = user.reviews.find(
+        (review) =>
+          review.rating === criteria.rating &&
+          review.message === criteria.message &&
+          review.date === criteria.date
+      );
+
+      if (review) {
+        async function updateUserReviews() {
+          await User.updateOne(
+            { _id: userId },
+            { $pull: { reviews: { _id: review._id } } }
+          )
+            .then((res) => {
+              console.log(res);
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        }
+
+        updateUserReviews(); // Call the function here
+      } else {
+        console.log("No matching review found");
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  res.sendStatus(200);
+});
+
+app.post("/api/editRating", async (req, res) => {
+  const itemID = req.body.itemID;
+  const userID = req.body.userID;
+  const username = req.body.username;
+  const rating = req.body.rating;
+  const message = req.body.message;
+
+  // Get the current date
+  const currentDate = new Date().toLocaleDateString("en-GB");
+
+  let currentMessage = await Product.findOne({
+    id: itemID,
+    "rating.ratings.author.userID": userID,
+  });
+  currentMessage = currentMessage.rating.ratings[0].message;
+
+  console.log(currentMessage);
+
+  await User.updateOne(
+    { _id: userID, "reviews.message": currentMessage },
+    {
+      $set: {
+        "reviews.$.rating": rating,
+        "reviews.$.message": message,
+        "reviews.$.edit.edited": true,
+        "reviews.$.edit.date": currentDate,
+      },
+    }
+  )
+    .then((res) => {
+      console.log(res);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  // Update the rating
+  await Product.updateOne(
+    { id: itemID, "rating.ratings.author.userID": userID },
+    {
+      $set: {
+        "rating.ratings.$.rating": rating,
+        "rating.ratings.$.message": message,
+        "rating.ratings.$.edit.edited": true,
+        "rating.ratings.$.edit.date": currentDate,
+      },
+    }
+  )
+    .then((res) => {
+      console.log(res);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  // Find the product again after the rating has been removed
+  const product = await Product.findOne({ id: itemID });
+
+  // Recalculate the average rating
+  let avgRating = 0;
+  if (product.rating.ratings.length > 0) {
+    avgRating =
+      product.rating.ratings.reduce((acc, curr) => acc + curr.rating, 0) /
+      product.rating.ratings.length;
+  }
+
+  // Update the average rating
+  await Product.updateOne({ id: itemID }, { "rating.rate": avgRating });
 
   res.sendStatus(200);
 });
 
 const options = {
-  key: fs.readFileSync("C:/Users/mants/private.key"),
-  cert: fs.readFileSync("C:/Users/mants/public.crt"),
+  key: fs.readFileSync("C:/Users/PC/private.key"),
+  cert: fs.readFileSync("C:/Users/PC/public.crt"),
 };
 
 https.createServer(options, app).listen(port, () => {
