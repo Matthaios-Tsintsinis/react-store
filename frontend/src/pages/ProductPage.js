@@ -3,12 +3,12 @@ import { useParams } from "react-router-dom";
 
 import AddRating from "../components/AddRating.js";
 import Loading from "../components/Loading.js";
-import PageNav from "../components/PageNav.js";
 import Reviews from "../components/Reviews.js";
 // import RatingStars from "../components/RatingStars.js";
 
 import axios from "axios";
 
+import AddToCart from "../components/AddToCart.js";
 import styles from "../components/ProductPage.module.css";
 
 function ProductPage({ authentication }) {
@@ -16,6 +16,7 @@ function ProductPage({ authentication }) {
   const [item, setItem] = useState({});
   const [loading, setLoading] = useState(false);
   const [refresh, setRefresh] = useState(false);
+  const [quantity, setQuantity] = useState(0);
 
   function onRefresh() {
     setRefresh((refresh) => !refresh);
@@ -45,8 +46,6 @@ function ProductPage({ authentication }) {
     <Loading />
   ) : (
     <div>
-      <PageNav authentication={authentication} key="ProductPagePageNav" />
-
       <div className={styles.container}>
         <img src={item.image} className={styles.productImage} alt={item.name} />
 
@@ -85,15 +84,25 @@ function ProductPage({ authentication }) {
           {item.available > 0 && (
             <div>
               <hr />
-              <select name="quantity" id="quantity">
+              <span>Qty:</span>
+              <select
+                name="quantity"
+                id="quantity"
+                value={quantity}
+                onChange={(e) => setQuantity(Number(e.target.value))}
+              >
                 {Array.from({ length: item.available }, (cur, index) => (
                   <option value={index} key={index}>
-                    Qty: {index + 1}
+                    {index + 1}
                   </option>
                 ))}
               </select>
               <hr />
-              <button>Add To Cart</button>
+              <AddToCart
+                authentication={authentication}
+                item={item}
+                quantity={Number(quantity) + 1}
+              />
             </div>
           )}
         </div>

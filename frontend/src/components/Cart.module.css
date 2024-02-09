@@ -1,0 +1,84 @@
+.cartSidepanel {
+  position: fixed;
+  right: 0;
+  height: 100%;
+  background-color: rgb(226, 226, 226);
+  z-index: 10;
+  min-width: 25%;
+  max-width: 400px;
+  box-shadow: -5px 0 5px rgba(0, 0, 0, 0.2);
+}
+
+.topPanel {
+  position: relative;
+  height: 12.5%;
+  background-color: #eee;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.closeCartButton {
+  position: absolute;
+  top: 0.5rem;
+  left: 1rem;
+  background-color: #eee;
+  border: none;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.shoppingCart {
+  position: relative !important;
+  bottom: 2px;
+}
+
+.cartProducts {
+  height: 75%;
+  background-color: rgb(226, 226, 226);
+  overflow-y: auto;
+}
+
+.noItemsMsgContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.noItemsMsg {
+  color: rgb(143, 143, 143);
+}
+
+.totalPay {
+  text-align: end;
+  margin-right: 2rem;
+}
+
+.totalPayTitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.totalPayNumber {
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+.bottomPanel {
+  height: 12.5%;
+  background-color: #eee;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.checkoutButton {
+  width: 80%;
+  height: 3.5rem;
+  font-size: large;
+  font-weight: 600;
+  background-color: black;
+  color: white;
+}

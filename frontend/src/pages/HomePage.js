@@ -1,11 +1,9 @@
 import ItemCarousel from "../components/ItemCarousel";
 import ItemsShowcase from "../components/ItemsShowcase";
-import PageNav from "../components/PageNav";
 
-function HomePage({ items, authentication }) {
+function HomePage({ items }) {
   return (
     <div>
-      <PageNav authentication={authentication} key="HomePagePageNav" />
       <ItemCarousel items={items} />
       <ItemsShowcase items={items} type="latest" numOfItems={-5}>
         Latest Additions

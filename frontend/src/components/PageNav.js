@@ -1,11 +1,26 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import NavItem from "./NavItem";
 import styles from "./PageNav.module.css";
 
 axios.defaults.withCredentials = true;
 
-function PageNav({ authentication }) {
+function PageNav({ authentication, onRefresh, onOpenCart }) {
+  const [userOptions, setUserOptions] = useState(true);
+
+  function signOut() {
+    axios
+      .get("https://localhost:3000/api/signOut")
+      .then((response) => {
+        onRefresh();
+      })
+      .catch((error) => {
+        console.log("Error:", error.message);
+        console.log("Response:", error.response);
+      });
+  }
+
   return (
     // <nav>
     //   <ul className={styles.navUl}>
@@ -44,17 +59,40 @@ function PageNav({ authentication }) {
             Explore
           </NavItem>
 
-          <NavItem to="/cart" type="">
+          <button onClick={onOpenCart} className={styles.cartButton}>
             Cart
             <img
               src={require("../public/shopping-cart-white.png")}
               alt="shopping cart"
               className={styles.shoppingCart}
             />
-          </NavItem>
+          </button>
 
           {authentication.authenticated ? (
-            <NavItem to="/profile">{authentication.user.username}</NavItem>
+            <div className={styles.dropdownContainer}>
+              <button
+                className={`${styles.dropdownBtn} ${
+                  !userOptions ? "active" : ""
+                }`}
+                onClick={() => setUserOptions((userOptions) => !userOptions)}
+              >
+                My Account
+              </button>
+              <div
+                className={`${styles.dropDownContentContainer} ${
+                  userOptions ? styles.hidden : ""
+                }`}
+              >
+                <div className={styles.dropdownContent}>
+                  <Link to="/profile" className={styles.dropdownItem}>
+                    Profile
+                  </Link>
+                  <button className={styles.dropdownItem} onClick={signOut}>
+                    Sign Out
+                  </button>
+                </div>
+              </div>
+            </div>
           ) : (
             <NavItem to="/signIn">Sign In</NavItem>
           )}

@@ -1,6 +1,5 @@
 import axios from "axios";
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import styles from "./EditReview.module.css";
 import StarRating from "./StarRating";
 
@@ -10,6 +9,7 @@ function EditReview({
   item,
   triggerRefresh,
   toggleEditting,
+  ratingId,
 }) {
   const [myReview, setMyReview] = useState(currentRating.message);
   const [myRating, setMyRating] = useState(0);
@@ -21,13 +21,12 @@ function EditReview({
   function submitHandler(e) {
     e.preventDefault();
 
-    console.log("Editting...");
-
     if (authentication.authenticated) {
       axios
         .post("https://localhost:3000/api/editRating", {
           username: authentication.user.username,
           rating: myRating,
+          ratingId: ratingId,
           itemID: item.id,
           userID: authentication.user._id,
           message: myReview,

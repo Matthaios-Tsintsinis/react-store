@@ -1,0 +1,42 @@
+.cardContainer {
+  padding: 1rem 1rem 0 1rem;
+  margin: 1rem;
+  border-radius: 13px;
+  border: 1px solid gainsboro;
+}
+
+.card {
+  display: flex;
+  position: relative;
+}
+
+.cardImage {
+  width: 20%;
+  object-fit: contain;
+  margin-right: 1rem;
+  vertical-align: middle;
+  border-image-repeat: stretch;
+  border-image-slice: 100%;
+}
+
+.cardTitle {
+  line-height: 20px;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  text-overflow: ellipsis;
+  white-space: wrap;
+  width: 100%;
+  display: inline-block;
+}
+
+.attributes {
+  margin-top: 0.5rem;
+  display: flex;
+  justify-content: end;
+  gap: 1rem;
+}
+
+.attributeTitle {
+  font-weight: 600;
+  margin-right: 0.2rem;
+}

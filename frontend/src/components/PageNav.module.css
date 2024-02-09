@@ -1,14 +1,3 @@
-.navUl {
-  list-style-type: none; /* Remove bullets */
-  padding: 0 1; /* Remove padding */
-  margin: 0; /* Remove margins */
-}
-
-.navItem {
-  margin-right: 1rem;
-  float: left;
-}
-
 .shoppingCart {
   width: 20px;
   position: relative !important;
@@ -17,6 +6,74 @@
 
 .logo {
   color: white !important;
+}
+
+.cartButton {
+  border: none;
+  background-color: rgb(33, 37, 41);
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.cartButton:hover {
+  color: white;
+}
+
+.dropdownContainer {
+  display: flex;
+  padding: 0.5rem;
+  float: left;
+  transition: left 5s ease-in-out 0.2s; /* Updated transition property with longer duration */
+}
+
+.dropdownContainer > div {
+  transition: all 5s ease-in-out 2s; /* Add transition property for the inner div */
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdownBtn {
+  border: none;
+  background-color: inherit !important;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.dropDownContentContainer {
+  position: relative;
+  /* left: 0.4rem; */
+  width: 5rem;
+}
+
+.hidden {
+  display: none;
+}
+
+.dropdownContent {
+  background-color: #f1f1f1;
+  width: 5rem;
+  position: absolute;
+  z-index: 1;
+  border-radius: 0 13px 13px 0;
+}
+
+.dropdownItem {
+  display: inline-block;
+  width: 100%;
+  text-decoration: none;
+  color: black;
+  border: none;
+  text-align: start;
+  margin: 0;
+  padding: 0.1rem 0.4rem 0.4rem 0.4rem;
+  border-radius: 0 13px 13px 0;
+}
+
+.dropdownItem:hover {
+  width: 100%;
+  background-color: #acacac;
+  border-radius: 0 13px 13px 0px;
 }
 
 :global(.active) {
@@ -31,4 +88,8 @@
 :global(.navbar-nav) {
   margin-left: auto !important;
   margin-right: 2rem;
+}
+
+:global(.navbar-brand) {
+  padding-left: 1rem;
 }

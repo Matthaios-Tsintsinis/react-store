@@ -5,6 +5,7 @@ const containerStyle = {
   alignItem: "center",
   gap: "16px",
   flexDirection: "column",
+  height: "80px",
 };
 
 const starContainerStyle = {

@@ -39,6 +39,7 @@ function Review({ item, rating, index, authentication, triggerRefresh }) {
           item={item}
           triggerRefresh={triggerRefresh}
           toggleEditting={toggleEditting}
+          ratingId={currentRating._id}
         />
       ) : (
         <div className={styles.container}>
@@ -61,18 +62,19 @@ function Review({ item, rating, index, authentication, triggerRefresh }) {
                 />
               </svg>
             ))}
-            {authentication.user._id === currentRating.author.userID && (
-              <div className={styles.authorOptions}>
-                <button onClick={() => setEditting(true)}>Edit</button>
-                <button onClick={() => setConfirmation(true)}>Delete</button>
-                {confirmation && (
-                  <div className={styles.confirmation}>
-                    <button onClick={() => deleteRating()}>YES</button>
-                    <button onClick={() => setConfirmation(false)}>NO</button>
-                  </div>
-                )}
-              </div>
-            )}
+            {authentication.authenticated &&
+              authentication.user._id === currentRating.author.userID && (
+                <div className={styles.authorOptions}>
+                  <button onClick={() => setEditting(true)}>Edit</button>
+                  <button onClick={() => setConfirmation(true)}>Delete</button>
+                  {confirmation && (
+                    <div className={styles.confirmation}>
+                      <button onClick={() => deleteRating()}>YES</button>
+                      <button onClick={() => setConfirmation(false)}>NO</button>
+                    </div>
+                  )}
+                </div>
+              )}
           </div>
           <div className={styles.ratingHeaderContainer}>
             <p className={styles.username}>

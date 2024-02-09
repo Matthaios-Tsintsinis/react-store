@@ -2,24 +2,37 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
+import Cart from "./components/Cart.js";
 import ItemsList from "./components/ItemsList.js";
 import Loading from "./components/Loading.js";
+import PageNav from "./components/PageNav.js";
 import ExploreCategory from "./pages/ExploreCategory.js";
 import HomePage from "./pages/HomePage.js";
 import ProductPage from "./pages/ProductPage.js";
 import Register from "./pages/Register.js";
 import Shop from "./pages/Shop.js";
 import SignIn from "./pages/SignIn.js";
+
 function App() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [authentication, setAuthentication] = useState(false);
   const [refresh, setRefresh] = useState(false);
+  const [openCart, setOpenCart] = useState(false);
+
+  function onOpenCart() {
+    setOpenCart(true);
+  }
+
+  function onCloseCart() {
+    setOpenCart(false);
+  }
 
   let categories = [];
 
   function onRefresh() {
-    setRefresh((refresh) => setRefresh(!refresh));
+    setRefresh((refresh) => !refresh);
+    console.log(refresh);
   }
 
   useEffect(() => {
@@ -66,6 +79,22 @@ function App() {
   ) : (
     <>
       <BrowserRouter>
+        <Cart
+          className={openCart ? "" : "notDisplayed"}
+          cartIsOpen={openCart}
+          onCloseCart={onCloseCart}
+          refreshCart={openCart}
+          authentication={authentication}
+        />
+
+        <div className={openCart ? "overlay" : "notDisplayed"}></div>
+
+        <PageNav
+          authentication={authentication}
+          onRefresh={onRefresh}
+          onOpenCart={onOpenCart}
+        />
+
         <Routes>
           <Route
             path="/"
@@ -113,7 +142,7 @@ function App() {
             }
           />
 
-          <Route path="cart" />
+          <Route path="cart" element={Cart} />
 
           <Route path="*" element={<h1>Path doesn't exist :(</h1>} />
         </Routes>

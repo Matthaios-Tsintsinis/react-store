@@ -103,7 +103,7 @@ const userSchema = new mongoose.Schema({
   username: String,
   password: String,
   email: String,
-  cart: [productSchema],
+  cart: [{ productSchema, quantity: Number }],
   reviews: [
     {
       rating: Number,
@@ -596,12 +596,12 @@ app.post("/api/signIn", async function (req, res) {
   });
 });
 
-app.post("/api/signOut", function (req, res, next) {
-  req.logout(function (err) {
+app.get("/api/signOut", async function (req, res, next) {
+  await req.logout(function (err) {
     if (err) {
       return next(err);
     }
-    res.redirect("http://localhost:3001/");
+    res.sendStatus(200);
   });
 });
 
@@ -650,10 +650,15 @@ app.post("/api/addRating", async (req, res) => {
     {
       $push: {
         "rating.ratings": {
-          author: { username, userID },
-          rating: rating,
-          message: message,
-          date: new Date().toLocaleDateString("en-GB"),
+          $each: [
+            {
+              author: { username, userID },
+              rating: rating,
+              message: message,
+              date: new Date().toLocaleDateString("en-GB"),
+            },
+          ],
+          $position: 0,
         },
       },
     }
@@ -772,8 +777,8 @@ app.post("/api/deleteRating", async (req, res) => {
 app.post("/api/editRating", async (req, res) => {
   const itemID = req.body.itemID;
   const userID = req.body.userID;
-  const username = req.body.username;
   const rating = req.body.rating;
+  const ratingId = req.body.ratingId;
   const message = req.body.message;
 
   // Get the current date
@@ -781,7 +786,9 @@ app.post("/api/editRating", async (req, res) => {
 
   let currentMessage = await Product.findOne({
     id: itemID,
-    "rating.ratings.author.userID": userID,
+    "rating.ratings": {
+      $elemMatch: { "author.userID": userID },
+    },
   });
   currentMessage = currentMessage.rating.ratings[0].message;
 
@@ -807,7 +814,7 @@ app.post("/api/editRating", async (req, res) => {
 
   // Update the rating
   await Product.updateOne(
-    { id: itemID, "rating.ratings.author.userID": userID },
+    { id: itemID, "rating.ratings._id": ratingId },
     {
       $set: {
         "rating.ratings.$.rating": rating,
@@ -839,6 +846,113 @@ app.post("/api/editRating", async (req, res) => {
   await Product.updateOne({ id: itemID }, { "rating.rate": avgRating });
 
   res.sendStatus(200);
+});
+
+app.post("/api/getInCartQuantity", async (req, res) => {
+  const userId = req.body.user._id;
+  const itemId = req.body.item.id;
+
+  try {
+    const user = await User.findOne({ _id: userId });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const itemInCart = user.cart.find(
+      (item) => item.productSchema.id === itemId
+    );
+    if (!itemInCart) {
+      return res.json({ quantity: 0 });
+    }
+
+    res.json({ quantity: itemInCart.quantity });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+app.post("/api/changeCartItemQuantity", async (req, res) => {
+  const quantity = req.body.quantity;
+  const productId = req.body.product._id;
+  const userId = req.body.user._id;
+
+  try {
+    const user = await User.findOne({ _id: userId });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Create a new cart array with the updated quantity for the specified product
+    user.cart = user.cart.map((item) =>
+      item.productSchema._id.toString() === productId.toString()
+        ? { ...item, quantity }
+        : item
+    );
+
+    // Save the updated user document
+    await user.save();
+
+    res.json({ message: "Cart updated successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+app.post("/api/addToCart", async (req, res) => {
+  const product = req.body.product;
+  const quantity = req.body.quantity;
+  const userId = req.body.user._id;
+
+  // Retrieve the user
+  const user = await User.findById(userId);
+
+  // Find the order for the product
+  const order = user.cart.find((order) =>
+    order.productSchema._id.equals(product._id)
+  );
+
+  if (order) {
+    // If the product is already in the cart, increment the quantity
+    order.quantity += quantity;
+  } else {
+    // If the product is not in the cart, add it
+    user.cart.push({ productSchema: product, quantity: quantity });
+  }
+
+  // Save the updated user
+  await user.save();
+  res.sendStatus(200);
+});
+
+app.post("/api/getCart", async (req, res) => {
+  const userId = req.body.user;
+
+  // Retrieve the user
+  const user = await User.findById(userId);
+
+  // Get the user's cart
+  const cart = user.cart;
+
+  res.json(cart);
+});
+
+app.delete("/api/removeFromCart", async (req, res) => {
+  const order = req.body.order;
+  const userId = req.body.authentication.user._id;
+
+  try {
+    await User.updateOne(
+      { _id: userId },
+      { $pull: { cart: { "productSchema._id": order.productSchema._id } } }
+    );
+
+    res.status(200).send("Product removed from cart");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error removing product from cart");
+  }
 });
 
 const options = {
