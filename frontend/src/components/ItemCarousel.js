@@ -29,7 +29,7 @@ function ItemCarousel({ items }) {
 
   useEffect(() => {
     document.getElementsByClassName("carousel-control-next")[0].click();
-  }, []);
+  });
 
   return (
     <div className={styles.carouselContainer}>

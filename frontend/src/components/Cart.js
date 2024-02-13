@@ -80,7 +80,7 @@ function Cart({ className, onCloseCart, authentication, cartIsOpen }) {
       <div className={styles.cartProducts}>
         {loading ? (
           <Loading />
-        ) : cart.length > 0 ? (
+        ) : cart?.length > 0 ? (
           cart.map((order) => (
             <CartItem
               order={order}
